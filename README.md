@@ -1,6 +1,60 @@
-# AQL Query Builder
+# ArangoDB AQL Query Builder
+
+A prototype version of an AQL Query Builder for Java 8. This project is not affiliated or supported by ArangoDB.
+
+This project is a byproduct of another project, so any help to improve the query builder is welcomed. If you have any improvements, suggestions, ideas or want to contribute, just open an issue or send a PR.
+
+## Todo
+- add options
+- add more default methods to reduce typing effort (`plus("x", 5)` instead of `plus(ref("x"), num(5))`),
+  though not always possible due to static typing of Java
+- better documentation
+- add tests
+
+## Getting Started
+Download the project from this repository and import as Maven project in your IDE. At this time there is no binary package or Maven repository integration.
+
+With the following static imports you're able to write all sorts of AQL queries:
+```java
+import static org.threatshare.arangodb.aql.ArangoQueryBuilder.*;
+import static org.threatshare.arangodb.aql.Expressions.*;
+import static org.threatshare.arangodb.aql.SortDirection.*;
+import static org.threatshare.arangodb.aql.GraphDirection.*;
+import static org.threatshare.arangodb.aql.CompoundValue.*;
+```
 
 ## API Overview
+The API offers an internal DSL that is as close as possible to the original query language.
+
+## Expressions
+We have different expressions available in AQL. They are located in `org.threatshare.arangodb.aql.Expressions`
+- unary operators: `plus(expr), minus(expr), not(expr)`
+- logical operators: `and(expr[, ...]), or(expr[, ...]), eq(expr, expr), etc.`
+- mathematical operators: `plus(expr[, ...]), minus(expr[, ...]), etc.`
+- ternary operator: `_if(conditionExpr, thenExpr, elseExpr)`
+- value literals: `num(nr), bool(true|false), _null(), quote(str), etc.`
+- selectors: `sel(selector), ref(selector)`
+- compound values: `object([entry("key", "value")[, ...]])[.entry("key2", "value2")[...]], array([expressions])[.entry(expr)[...]]`
+- bind parameter: `bindParam(name)`
+- function call: `func(name[, args])`
+- sub expression: `subExpr(expr)`
+- sub query: `subQuery(query())`
+- range: `range(from, to)`
+
+Expressions can be created by using the static methods from the `Expressions` class, or through chaining:
+```java
+// with static methods:
+and(gt(ref("x"), num(5)), lte(ref("y"), ref("z")));
+
+// with chaining:
+ref("x").gt(num(5)).and(ref("y").lte(ref("z")));
+
+// result of both:
+// ((`x` > 5) && (`y` <= `z`))
+```
+
+## Statements
+Statements can be converted to String by using the `toAQL()` method.
 
 ### FOR Statement
 AQL:
